@@ -3,6 +3,6 @@ interface SyncStore {
   data: object
 }
 export const  SyncStore: SyncStore = {
-  api: 'http://xhqt.ruiziyou.com:39700/dev_bsu_hgr/getHost',
+  api: process.env.SYNC_STORE_URL,
   data: {"title": "all"}
 }

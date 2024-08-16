@@ -83,22 +83,10 @@ stages:
           - mkdir -p /www/wwwroot/RzyApp
           - tar zxvf ~/gitee_go/deploy/output.tar.gz -C /www/wwwroot/RzyApp
           - cp -r /www/wwwroot/RzyAppConfig/deploy.sh /www/wwwroot/RzyApp/dist/deploy.sh
-          - ''
-          - cd /www/server/nvm/versions/node/v16.20.2/bin/
-          - ls
-          - ''
-          - cd /www/wwwroot/RzyAppConfig
+          - cd /www/wwwroot/RzyApp/dist
           - chmod 755 deploy.sh
           - bash deploy.sh
-          - which npm node pm2
-          - '# 设置 npm 下载地址，忽略 https 认证'
-          - npm config set strict-ssl false
-          - npm config set registry http://mirrors.cloud.tencent.com/npm/
           - ''
-          - '# 安装依赖'
-          - npm install
-          - ''
-          - pm2 restart saasapi
         notify: []
         strategy:
           retry: '0'

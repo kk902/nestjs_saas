@@ -24,6 +24,7 @@ stages:
           - 'pnpm install '
           - rm -rf ./dist
           - pnpm build
+          - cp -r ./package.json ./dist/package.json
         artifacts:
           - name: BUILD_ARTIFACT
             path:

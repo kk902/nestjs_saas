@@ -31,8 +31,7 @@ async function bootstrap() {
   app.setViewEngine('ejs')
   const configService = app.get(ConfigService);
   const port = configService.get('PORT')||3001
-  const service = configService.get('SERVICE') || '127.0.0.1'
   await app.listen(port);
-  logger.warn(`项目启动成功${service}:${port}`)
+  logger.warn(`项目启动成功localhost:${port}`)
 }
 bootstrap();

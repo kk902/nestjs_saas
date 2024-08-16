@@ -3,6 +3,7 @@ import { SaasService } from './saas.service';
 import { TokenSaasDto } from './dto/token-saas.dto';
 import { User } from '../user/entities/user.entity';
 import { StoreService } from '../store/store.service';
+import { TokenType } from 'src/config/originConfig/origin';
 @Controller('openSaas')
 export class SaasController {
   constructor(
@@ -22,26 +23,30 @@ export class SaasController {
   }
 
   @Post('*')
-  async service(@Req() req:Request & {user:User} & {ip: string}) {
+  async service(@Req() req:Request & {user:User & {tokenType: string}} & {ip: string} ) {
+    if(req.user.tokenType !== TokenType.SAAS) throw new HttpException('token错误',HttpStatus.BAD_REQUEST)
     const ip = req.headers['x-forwarded-for']?req.headers['x-forwarded-for']:req.ip.replace(/::ffff:/g,'')//获取访问ip
     const mcode: string = req.headers['mcode']
     if(!mcode) throw new HttpException('mcode未传入',HttpStatus.BAD_REQUEST)
-
+    /**判断ip是否在白名单内 门店是否在该账号门店列表内 */  
     const userData = JSON.parse(await this.saasService.userRedis(req.user._id))
-    
-    const apiData = JSON.parse(await this.saasService.apiRedis())
     if(!userData.white_list.includes(ip)) throw new HttpException('该ip没有调用权限',HttpStatus.BAD_REQUEST)
     if(!userData.store_list.includes(mcode)) throw new HttpException('该mcode不在该saas账号下',HttpStatus.BAD_REQUEST)
 
-      const storeData = JSON.parse(await this.saasService.storeRedis(mcode))
-      if(!storeData) throw new HttpException('门店不存在',HttpStatus.BAD_REQUEST)
-    
-    if(!storeData.api_list.includes(req.url)) throw new HttpException('该门店没有调用该接口权限',HttpStatus.BAD_REQUEST)
-    
+    /**以门店作为颗粒度总拦截-已废弃 */
+    // const storeData = JSON.parse(await this.saasService.storeRedis(mcode))
+    // if(!storeData) throw new HttpException('门店不存在',HttpStatus.BAD_REQUEST)
+    // if(!storeData.api_list.includes(req.url)) throw new HttpException('该用户没有调用该门店该接口权限',HttpStatus.BAD_REQUEST)
+
+    /**以账号+门店为颗粒度拦截 */
+    const permissData = JSON.parse(await this.saasService.permissRedis(mcode,req.user.appId))
+    if(!permissData.api_list.includes(req.url)) throw new HttpException('该用户没有调用该门店该接口权限',HttpStatus.BAD_REQUEST)
+    /**获取saas平台url---真正服务端url 映射 */
+    const apiData = JSON.parse(await this.saasService.apiRedis())
     let map_api = ''
     for(const item of apiData) { if(item.saas_api === req.url) map_api = item.map_api }
     if(!map_api) throw new HttpException('未查询到该接口映射',HttpStatus.BAD_REQUEST)
-    const data = await this.saasService.axios(map_api,req.body)
+    const data = await this.saasService.axios(map_api,req.body, mcode)
     return data
   }
 

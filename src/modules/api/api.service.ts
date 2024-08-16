@@ -35,7 +35,7 @@ export class ApiService {
   async updateRedis() {
     const apiData = await this.apiModel.find()
     const redis = this.redisService.getClient()
-    await redis.set(`opensaas:api`,JSON.stringify(apiData))
+    await redis.set(`opensaas:api`,JSON.stringify(apiData), 'EX', 3600)
   }
   
 }

@@ -1,5 +1,4 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { UpdateStoreDto } from './dto/update-store.dto';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { Store } from './entities/store.entity';
@@ -18,10 +17,9 @@ export class StoreService {
   ) {}
   async syncStore() {
     const SyncStore = {
-      api: `${process.env.SYNC_STORE_URL}/getHost`,
+      api: `${process.env.SYNCDATA_URL}/dev_bsu_hgr/getHost`,
       data: {"title": "all"}
     }
-    
     const response = await firstValueFrom(this.httpService.post(SyncStore.api, SyncStore.data));
     const storeData = response?.data?.data
     if(!isArray(storeData)) throw new HttpException('获取门店数据错误', HttpStatus.NO_CONTENT);
@@ -41,7 +39,7 @@ export class StoreService {
     if(!updateData.matchedCount ) throw new HttpException('更新失败', HttpStatus.NOT_FOUND)
     const storeData = await this.findOne({mcode})
     const redis = this.redisService.getClient()
-    await redis.set(`opensaas:store:${mcode}`,JSON.stringify(storeData), 'EX', 24 * 3600)
+    await redis.set(`opensaas:store:${mcode}`,JSON.stringify(storeData), 'EX', 3600)
   }
   async find({store_list}: FindOneStoreDto) {
     return this.storeModel.find({mcode: { $in: store_list}}).lean().exec()

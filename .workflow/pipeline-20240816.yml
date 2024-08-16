@@ -86,7 +86,7 @@ stages:
           - cd /www/wwwroot/RzyAppConfig
           - chmod 755 deploy.sh
           - bash deploy.sh
-          - sh npm node pm2
+          - which npm node pm2
           - '# 设置 npm 下载地址，忽略 https 认证'
           - npm config set strict-ssl false
           - npm config set registry http://mirrors.cloud.tencent.com/npm/

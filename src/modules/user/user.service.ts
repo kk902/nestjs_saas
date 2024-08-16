@@ -8,8 +8,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { LoginUserDto } from './dto/login-user.dto';
 import { AuthService } from 'src/config/service/AuthSservice';
-import { promises } from 'dns';
 import { FindAllUserDto } from './dto/findAll-user.dto';
+import { firstValueFrom } from 'rxjs';
+import { HttpService } from '@nestjs/axios';
 
 
 
@@ -21,7 +22,9 @@ export class UserService {
     @InjectModel('User') 
     private userModel: Model<User>,
 
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
+
+    private readonly httpService: HttpService,
   ) {}
   async create(createUserDto: CreateUserDto) {
     const {phone_number} = createUserDto
@@ -67,10 +70,6 @@ export class UserService {
       const flag = await this.authService.comparePasswords(updateUserDto.oldPassword , userData.password)
       if(!flag) throw new HttpException('密码错误', HttpStatus.UNAUTHORIZED);
     }
-    if(updateUserDto.phone_number) {
-      const findNumber = await this.findOne({phone_number: updateUserDto.phone_number})
-      if(findNumber) throw new HttpException('该手机号已经存在', HttpStatus.CONFLICT);
-    }
     const user_id = updateUserDto.user_id
     delete updateUserDto.user_id
     delete updateUserDto.oldPassword
@@ -80,7 +79,28 @@ export class UserService {
     const findData = await this.findOne({user_id})
     delete findData.password
     const redis = this.redisService.getClient()
-    await redis.set(`opensaas:user:${user_id}`,JSON.stringify(findData), 'EX', 24 * 3600)
+    await redis.set(`opensaas:user:${user_id}`,JSON.stringify(findData), 'EX', 3600)
+    /**同步用户数据 */
+    await this.getSyncData(findData)
     return findData
   }
+
+  async getSyncData(findData: User) {
+    const tokenUrl = []
+    if(findData.test_callback && findData.test_callback.status) tokenUrl.push({url: findData.test_callback.url})
+    if(findData.product_callback && findData.product_callback.status) tokenUrl.push({url: findData.product_callback.url})
+    const syncData = {
+      appid: findData.appId,
+      tokenUrl,
+      mcode: findData.store_list,
+      name: findData.saas_name,
+      phone: findData.phone_number,
+    }
+    const syncDataUrl = `${process.env.SYNCDATA_URL}/dev_qt_lql/openSaas/setSassUser`
+    const response = await firstValueFrom(this.httpService.post(syncDataUrl,syncData))
+    // console.log(response.data);
+    
+    return syncData
+  }
+
 }

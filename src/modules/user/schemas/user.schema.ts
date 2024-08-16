@@ -12,6 +12,14 @@ export const UserSchema = new Schema<User>({
   key: { type: String },
   white_list: [{ type: String}],
   store_list: [{ type: String}],
+  test_callback: {
+    url: {type: String},
+    status: {type: Boolean}
+  },
+  product_callback: {
+    url: {type: String},
+    status: {type: Boolean}
+  }
 });
 
 export const UserModel = model<User>('User', UserSchema);

@@ -1,6 +1,15 @@
-import { IsString, IsPhoneNumber, IsNotEmpty, IsEnum, IsOptional, IsArray, IsBoolean, IsMongoId } from 'class-validator';
+import { IsString, IsPhoneNumber, IsNotEmpty, IsEnum, IsOptional, IsArray, IsBoolean, IsMongoId, ValidateNested, IsObject } from 'class-validator';
 import { UserRole } from './create-user.dto';
-import { mongo } from 'mongoose';
+
+class CallbackDto {
+    @IsOptional()
+    @IsString()
+    url: string
+
+    @IsOptional()
+    @IsBoolean()
+    status: boolean
+}
 export class UpdateUserDto {
   @IsString()
   @IsMongoId()
@@ -15,9 +24,9 @@ export class UpdateUserDto {
   @IsOptional()
   role?: string;
 
-  @IsPhoneNumber('CN')
-  @IsOptional()
-  phone_number?: string;
+  // @IsPhoneNumber('CN')
+  // @IsOptional()
+  // phone_number?: string;
 
   @IsString()
   @IsOptional()
@@ -33,10 +42,6 @@ export class UpdateUserDto {
 
   @IsString()
   @IsOptional()
-  appId?: string;
-
-  @IsString()
-  @IsOptional()
   key?: string;
 
   @IsArray()
@@ -48,4 +53,12 @@ export class UpdateUserDto {
   @IsOptional()
   @IsString({ each: true }) // Ensures each element in the array is a string
   store_list?: string[];
+  
+  @IsOptional()
+  @IsObject()
+  test_callback?: CallbackDto;
+
+  @IsOptional()
+  @IsObject()
+  product_callback?: CallbackDto;
 }

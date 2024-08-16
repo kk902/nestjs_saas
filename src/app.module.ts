@@ -9,23 +9,27 @@ import { UserModule } from './modules/user/user.module';
 import { ApiModule } from './modules/api/api.module';
 import { StoreModule } from './modules/store/store.module';
 import { SaasModule } from './modules/saas/saas.module';
+import { PermissModule } from './modules/permiss/permiss.module';
 
 
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),//加载.env
+    ConfigModule.forRoot({
+      isGlobal:true
+    }),//加载.env
     MongoModule,//连接MongoDB
     RedisModule,//连接redis 并提供
     UserModule,
     ApiModule,
     StoreModule,
+    PermissModule,
     JwtModule.register({
       secret: 'this is a secret', // 你可以把这个值放在环境变量中
       signOptions: { expiresIn: '10h' }, // 设置 token 过期时间
       global:true
     }),
-    SaasModule
+    SaasModule,
   ]
 })
 export class AppModule implements NestModule {

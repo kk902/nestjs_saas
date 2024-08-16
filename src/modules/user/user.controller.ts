@@ -5,9 +5,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { FindAllUserDto } from './dto/findAll-user.dto';
 import { FindOneUserDto } from './dto/findOne-user.dto';
-
 import { User, UserRole } from './entities/user.entity';
-import { IsArray, isArray, isBoolean, IsNotEmpty, IsNotEmptyObject } from 'class-validator';
 
 @Controller('user')
 export class UserController {
@@ -51,8 +49,6 @@ export class UserController {
   async update(@Body() updateUserDto: UpdateUserDto,@Req() req:Request & {user:User}) {
     if(req.user.role === UserRole.USER && updateUserDto.user_id) 
       throw new HttpException('无更改其他用户权限', HttpStatus.UNAUTHORIZED)
-    if(req.user.role === UserRole.USER && updateUserDto.appId) 
-      throw new HttpException('无更改appId权限', HttpStatus.UNAUTHORIZED)
     if(req.user.role === UserRole.USER && updateUserDto.status !== undefined) 
       throw new HttpException('无更改账号状态权限', HttpStatus.UNAUTHORIZED)
     if(req.user.role === UserRole.USER && updateUserDto.store_list) 

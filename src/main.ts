@@ -7,9 +7,10 @@ import { AllExceptionsFilter } from './config/service/AllExceptionsFilter ';
 
 import { HttpInterceptor } from './config/service/http.interceptor';
 import { logger } from './config/service/logger';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule,{cors:true,logger:false});
+  const app = await NestFactory.create<NestExpressApplication>(AppModule,{cors:true /** ,logger:false*/});
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true, // 去除 DTO 中没有定义的字段
@@ -28,7 +29,9 @@ async function bootstrap() {
   //配置模板引擎
   app.setBaseViewsDir('views')
   app.setViewEngine('ejs')
-  await app.listen(3000);
-  logger.warn("项目启动成功.....")
+  const configService = app.get(ConfigService);
+  const port = configService.get('PORT')||3001
+  await app.listen(port);
+  logger.warn(`项目启动成功localhost:${port}`)
 }
 bootstrap();

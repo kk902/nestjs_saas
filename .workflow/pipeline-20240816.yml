@@ -84,7 +84,7 @@ stages:
           - tar zxvf ~/gitee_go/deploy/output.tar.gz -C /www/wwwroot/RzyApp
           - cd /www/wwwroot/RzyAppConfig
           - chmod 755 appStart.sh
-          - sh appStart.sh
+          - bash appStart.sh
           - ''
         notify: []
         strategy:

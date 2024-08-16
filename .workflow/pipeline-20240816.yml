@@ -83,6 +83,10 @@ stages:
           - mkdir -p /www/wwwroot/RzyApp
           - tar zxvf ~/gitee_go/deploy/output.tar.gz -C /www/wwwroot/RzyApp
           - cp -r /www/wwwroot/RzyAppConfig/deploy.sh /www/wwwroot/RzyApp/dist/deploy.sh
+          - ''
+          - cd /www/server/nvm/versions/node/v16.20.2/bin/npm
+          - ls
+          - ''
           - cd /www/wwwroot/RzyAppConfig
           - chmod 755 deploy.sh
           - bash deploy.sh

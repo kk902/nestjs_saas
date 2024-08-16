@@ -1,7 +1,6 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { UpdateStoreDto } from './dto/update-store.dto';
 import { HttpService } from '@nestjs/axios';
-import { SyncStore } from 'src/config/apiConfig/syncStore.config';
 import { firstValueFrom } from 'rxjs';
 import { Store } from './entities/store.entity';
 import { Model } from 'mongoose';
@@ -18,6 +17,11 @@ export class StoreService {
     @InjectModel('Store') private storeModel: Model<Store>,
   ) {}
   async syncStore() {
+    const SyncStore = {
+      api: `${process.env.SYNC_STORE_URL}/getHost`,
+      data: {"title": "all"}
+    }
+    
     const response = await firstValueFrom(this.httpService.post(SyncStore.api, SyncStore.data));
     const storeData = response?.data?.data
     if(!isArray(storeData)) throw new HttpException('获取门店数据错误', HttpStatus.NO_CONTENT);

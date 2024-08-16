@@ -14,7 +14,7 @@ import { HttpModule } from '@nestjs/axios';
       { name: 'Saas', schema: SaasSchema, collection: "saas" },
       { name: 'User', schema: UserSchema, collection: "users" },
       { name: 'Store', schema: StoreSchema, collection: "stores" },
-      { name: 'Api', schema: ApiSchema, collection: "apis" },
+      { name: 'Api', schema: ApiSchema, collection: "apis" }
     ]),
     HttpModule
   ],

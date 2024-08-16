@@ -82,9 +82,10 @@ stages:
           - '# 使用场景：先将制品包解压缩到指定目录中，再执行启动脚本deploy.sh，脚本示例地址：https://gitee.com/gitee-go/spring-boot-maven-deploy-case/blob/master/deploy.sh'
           - mkdir -p /www/wwwroot/RzyApp
           - tar zxvf ~/gitee_go/deploy/output.tar.gz -C /www/wwwroot/RzyApp
+          - cp -r /www/wwwroot/RzyAppConfig/deploy.sh /www/wwwroot/RzyApp/dist/deploy.sh
           - cd /www/wwwroot/RzyAppConfig
-          - chmod 755 appStart.sh
-          - bash appStart.sh
+          - chmod 755 deploy.sh
+          - bash deploy.sh
           - ''
         notify: []
         strategy:

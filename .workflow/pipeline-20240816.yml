@@ -84,7 +84,7 @@ stages:
           - tar zxvf ~/gitee_go/deploy/output.tar.gz -C /www/wwwroot/RzyApp
           - cp -r /www/wwwroot/RzyAppConfig/deploy.sh /www/wwwroot/RzyApp/dist/deploy.sh
           - ''
-          - cd /www/server/nvm/versions/node/v16.20.2/bin/npm
+          - cd /www/server/nvm/versions/node/v16.20.2/bin/
           - ls
           - ''
           - cd /www/wwwroot/RzyAppConfig

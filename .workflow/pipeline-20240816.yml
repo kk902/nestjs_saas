@@ -28,9 +28,7 @@ stages:
           - name: BUILD_ARTIFACT
             path:
               - ./dist
-        caches:
-          - ~/.npm
-          - ~/.yarn
+        caches: []
         notify: []
         strategy:
           retry: '0'
@@ -83,9 +81,10 @@ stages:
           - '# 使用场景：先将制品包解压缩到指定目录中，再执行启动脚本deploy.sh，脚本示例地址：https://gitee.com/gitee-go/spring-boot-maven-deploy-case/blob/master/deploy.sh'
           - mkdir -p /www/wwwroot/RzyApp
           - tar zxvf ~/gitee_go/deploy/output.tar.gz -C /www/wwwroot/RzyApp
-          - cd /www/wwwroot/RzyApp/dist
-          - '#chmod 755 deploy.sh'
-          - '#sh deploy.sh'
+          - cd /www/wwwroot/RzyAppConfig
+          - ''
+          - sh appStart.sh
+          - ''
         notify: []
         strategy:
           retry: '0'

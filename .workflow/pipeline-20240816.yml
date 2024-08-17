@@ -1,0 +1,92 @@
+version: '1.0'
+name: pipeline-20240816
+displayName: pipelineRelease
+triggers:
+  trigger: auto
+  push:
+    branches:
+      precise:
+        - release
+stages:
+  - name: stage-1362c422
+    displayName: 打包NestJs
+    strategy: naturally
+    trigger: auto
+    executor: []
+    steps:
+      - step: build@nodejs
+        name: build_nodejs
+        displayName: Nodejs 构建
+        nodeVersion: 18.16.0
+        commands:
+          - npm config set registry https://mirrors.cloud.tencent.com/npm/
+          - npm i -g pnpm
+          - 'pnpm install '
+          - rm -rf ./dist
+          - pnpm build
+          - cp -r ./package.json ./dist/package.json
+        artifacts:
+          - name: BUILD_ARTIFACT
+            path:
+              - ./dist
+        caches: []
+        notify: []
+        strategy:
+          retry: '0'
+      - step: publish@general_artifacts
+        name: publish_general_artifacts
+        displayName: 上传制品
+        dependArtifact: BUILD_ARTIFACT
+        artifactName: output
+        notify: []
+        strategy:
+          retry: '0'
+        dependsOn: build_nodejs
+  - name: stage-ab0c446d
+    displayName: 发布
+    strategy: naturally
+    trigger: auto
+    executor: []
+    steps:
+      - step: publish@release_artifacts
+        name: publish_release_artifacts
+        displayName: 发布
+        dependArtifact: output
+        version: 1.0.0.0
+        autoIncrement: true
+        notify: []
+        strategy:
+          retry: '0'
+  - name: stage-b00e9223
+    displayName: 部署
+    strategy: naturally
+    trigger: auto
+    executor: []
+    steps:
+      - step: deploy@agent
+        name: deploy_agent
+        displayName: 主机部署
+        hostGroupID:
+          ID: testhosttx
+          hostID:
+            - a8bba910-9bd7-436a-a952-3a54ce78bd29
+        deployArtifact:
+          - source: artifact
+            name: output
+            target: ~/gitee_go/deploy
+            artifactRepository: default
+            artifactName: output
+            artifactVersion: latest
+        script:
+          - '# 功能：部署脚本会在部署主机组的每台机器上执行'
+          - '# 使用场景：先将制品包解压缩到指定目录中，再执行启动脚本deploy.sh，脚本示例地址：https://gitee.com/gitee-go/spring-boot-maven-deploy-case/blob/master/deploy.sh'
+          - mkdir -p /www/wwwroot/RzyApp
+          - tar zxvf ~/gitee_go/deploy/output.tar.gz -C /www/wwwroot/RzyApp
+          - cp -r /www/wwwroot/RzyAppConfig/deploy.sh /www/wwwroot/RzyApp/dist/deploy.sh
+          - cd /www/wwwroot/RzyApp/dist
+          - chmod 755 deploy.sh
+          - bash deploy.sh
+          - ''
+        notify: []
+        strategy:
+          retry: '0'

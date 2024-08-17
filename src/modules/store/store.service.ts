@@ -17,7 +17,7 @@ export class StoreService {
   ) {}
   async syncStore() {
     const SyncStore = {
-      api: `${process.env.SYNCDATA_URL}/dev_bsu_hgr/getSaasHost`
+      api: `${process.env.SYNCDATA_URL}/getSaasHost`
     }
     const response = await firstValueFrom(this.httpService.get(SyncStore.api));
     const storeData = response?.data?.data

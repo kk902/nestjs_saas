@@ -10,6 +10,7 @@ import { HttpModule } from '@nestjs/axios';
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: 'User', schema: UserSchema, collection: "users" }]),
+    MongooseModule.forFeature([{ name: 'Store', schema: UserSchema, collection: "stores" }]),
     HttpModule
   ],
   controllers: [UserController],

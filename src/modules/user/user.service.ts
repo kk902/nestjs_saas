@@ -11,6 +11,7 @@ import { AuthService } from 'src/config/service/AuthSservice';
 import { FindAllUserDto } from './dto/findAll-user.dto';
 import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
+import { Store } from '../store/entities/store.entity';
 
 
 
@@ -25,6 +26,9 @@ export class UserService {
     private readonly authService: AuthService,
 
     private readonly httpService: HttpService,
+
+    @InjectModel('Store') 
+    private storeModel: Model<Store>,
   ) {}
   async create(createUserDto: CreateUserDto) {
     const {phone_number} = createUserDto
@@ -81,11 +85,11 @@ export class UserService {
     const redis = this.redisService.getClient()
     await redis.set(`opensaas:user:${user_id}`,JSON.stringify(findData), 'EX', 3600)
     /**同步用户数据 */
-    await this.getSyncData(findData)
+    await this.SyncData(findData)
     return findData
   }
 
-  async getSyncData(findData: User) {
+  async SyncData(findData: User) {
     const tokenUrl = []
     if(findData.test_callback && findData.test_callback.status) tokenUrl.push({url: findData.test_callback.url})
     if(findData.product_callback && findData.product_callback.status) tokenUrl.push({url: findData.product_callback.url})
@@ -96,11 +100,32 @@ export class UserService {
       name: findData.saas_name,
       phone: findData.phone_number,
     }
-    const syncDataUrl = `${process.env.SYNCDATA_URL}/dev_qt_lql/openSaas/setSassUser`
-    const response = await firstValueFrom(this.httpService.post(syncDataUrl,syncData))
-    // console.log(response.data);
+    const group = await this.getOnePerGroup()
+    // //上传用户回调
+    for(const item of group) {
+      const syncDataUrl = `${item.saasapi}/openSaas/setSassUser`
+      const response = await firstValueFrom(this.httpService.post(syncDataUrl,syncData))
+    }
     
     return syncData
+  }
+
+  async getOnePerGroup() {
+    const result = await this.storeModel.aggregate([
+      {
+        $group: {
+          _id: '$dbname',          // 按 dbname 字段分组
+          document: { $first: "$$ROOT" } // 选择每组中的第一个文档
+        }
+      },
+      {
+        $replaceRoot: { newRoot: "$document" } // 将每组中的文档提升为根文档
+      },
+      {
+        $sort: { _id: 1 } // 可选：按 _id 排序（可以根据需要修改或删除）
+      }
+    ]);
+    return result;
   }
 
 }

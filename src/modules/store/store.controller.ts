@@ -29,6 +29,9 @@ export class StoreController {
       throw new HttpException("权限不足",HttpStatus.FORBIDDEN)
     findOneStoreDto.store_list = findOneStoreDto.store_list || req.user.store_list
     const store_list = await this.storeService.find(findOneStoreDto);
+    if(req.user.role === UserRole.USER) {
+      store_list.forEach(item => delete item.saasapi)
+    }
     return {code: 200,message: "查询成功",data: {store_list}}
   }
 

@@ -17,18 +17,21 @@ export class StoreService {
   ) {}
   async syncStore() {
     const SyncStore = {
-      api: `${process.env.SYNCDATA_URL}/dev_bsu_hgr/getHost`,
-      data: {"title": "all"}
+      api: `${process.env.SYNCDATA_URL}/dev_bsu_hgr/getSaasHost`
     }
-    const response = await firstValueFrom(this.httpService.post(SyncStore.api, SyncStore.data));
+    const response = await firstValueFrom(this.httpService.get(SyncStore.api));
     const storeData = response?.data?.data
     if(!isArray(storeData)) throw new HttpException('获取门店数据错误', HttpStatus.NO_CONTENT);
+
+    const redis = this.redisService.getClient()
     for(const item of storeData) {
-      delete item._id
       const mcode = item.mcode
       await this.storeModel.updateOne({ mcode },{ $set: item },{ upsert: true })
+      const mcodeData = await this.findOne({mcode})
+      const key = `opensaas:store:${mcode}`
+      await redis.set(key,JSON.stringify(mcodeData), 'EX', 3600)
     }
-    return 
+    return
   }
 
   async update(updateStoreDto: Store) {
@@ -42,7 +45,17 @@ export class StoreService {
     await redis.set(`opensaas:store:${mcode}`,JSON.stringify(storeData), 'EX', 3600)
   }
   async find({store_list}: FindOneStoreDto) {
-    return this.storeModel.find({mcode: { $in: store_list}}).lean().exec()
+    const redis = this.redisService.getClient()
+    const storeData = []
+    for(const mcode of store_list) {
+      const key = `opensaas:store:${mcode}`
+      const redisData = await redis.get(key)
+      if(redisData) { storeData.push(JSON.parse(redisData)); continue;}
+      const mcodeData = await this.findOne({mcode})
+      await redis.set(key,JSON.stringify(mcodeData),'EX', 3600)
+      storeData.push(mcodeData)
+    }
+    return storeData
   }
   async findAll(findAllUserDto: FindAllStoreDto) {
     const {page_index, page_size} = findAllUserDto

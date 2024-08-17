@@ -10,7 +10,7 @@ import { logger } from './config/service/logger';
 import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule,{cors:true /** ,logger:false*/});
+  const app = await NestFactory.create<NestExpressApplication>(AppModule,{cors:true,logger:false});
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true, // 去除 DTO 中没有定义的字段

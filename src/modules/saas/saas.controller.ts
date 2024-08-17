@@ -41,11 +41,15 @@ export class SaasController {
     /**以账号+门店为颗粒度拦截 */
     const permissData = JSON.parse(await this.saasService.permissRedis(mcode,req.user.appId))
     if(!permissData.api_list.includes(req.url)) throw new HttpException('该用户没有调用该门店该接口权限',HttpStatus.BAD_REQUEST)
-    /**获取saas平台url---真正服务端url 映射 */
+    /**获取saas平台提供url，判断传入url是否正确 */
+    let flag = false
     const apiData = JSON.parse(await this.saasService.apiRedis())
-    let map_api = ''
-    for(const item of apiData) { if(item.saas_api === req.url) map_api = item.map_api }
-    if(!map_api) throw new HttpException('未查询到该接口映射',HttpStatus.BAD_REQUEST)
+    for(const item of apiData) { if(item.saas_api === req.url) flag = true }
+    if(!flag) throw new HttpException('接口错误，请检查您的url',HttpStatus.BAD_REQUEST)
+
+    /**拼接映射的url */
+    const storeData = JSON.parse(await this.saasService.storeRedis(mcode))
+    let map_api = storeData.saasapi + req.url.slice(4)
     const data = await this.saasService.axios(map_api,req.body, mcode)
     return data
   }

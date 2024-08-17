@@ -8,10 +8,6 @@ export class CreateApiDto {
 
   @IsString()
   @IsNotEmpty()
-  map_api?: string
-
-  @IsString()
-  @IsNotEmpty()
   describe: string
   
   @Optional()

@@ -25,9 +25,6 @@ export class ApiController {
   @Post('find')
   async findAll(@Req() req:Request & {user:User}) {
     const api_list = await this.apiService.findAll();
-    if(req.user.role === UserRole.USER) { //不对外公布api映射
-      api_list.forEach(item=>delete item.map_api)
-    }
     return {code: 200,message: '查询api列表成功', data: {api_list}}
   }
 }

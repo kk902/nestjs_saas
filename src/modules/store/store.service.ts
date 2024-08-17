@@ -2,7 +2,6 @@ import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { Store } from './entities/store.entity';
-import { Storedb} from './schemas/store.schema';
 import { Model } from 'mongoose';
 import { RedisService } from 'src/config/redis/redis.service';
 import { InjectModel } from '@nestjs/mongoose';
@@ -14,7 +13,7 @@ export class StoreService {
   constructor(
     private readonly httpService: HttpService,
     private readonly redisService: RedisService,
-    @InjectModel(Storedb.name) private storeModel:Model<Storedb>,
+    @InjectModel('Store') private storeModel:Model<Store>,
   ) {}
   async syncStore() {
     const SyncStore = {

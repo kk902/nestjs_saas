@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { Store } from './entities/store.entity';
+import { Storedb} from './schemas/store.schema';
 import { Model } from 'mongoose';
 import { RedisService } from 'src/config/redis/redis.service';
 import { InjectModel } from '@nestjs/mongoose';
@@ -13,7 +14,7 @@ export class StoreService {
   constructor(
     private readonly httpService: HttpService,
     private readonly redisService: RedisService,
-    @InjectModel('Store') private storeModel: Model<Store>,
+    @InjectModel(Storedb.name) private storeModel:Model<Storedb>,
   ) {}
   async syncStore() {
     const SyncStore = {
@@ -26,7 +27,7 @@ export class StoreService {
     const redis = this.redisService.getClient()
     for(const item of storeData) {
       const mcode = item.mcode
-      await this.storeModel.updateOne({ mcode },{ $set: item },{ upsert: true })
+      await this.storeModel.findOneAndUpdate({ mcode },{$set: item },{ upsert: true })
       const mcodeData = await this.findOne({mcode})
       const key = `opensaas:store:${mcode}`
       await redis.set(key,JSON.stringify(mcodeData), 'EX', 3600)

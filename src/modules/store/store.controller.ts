@@ -31,6 +31,7 @@ export class StoreController {
     const store_list = await this.storeService.find(findOneStoreDto);
     if(req.user.role === UserRole.USER) {
       store_list.forEach(item => delete item.saasapi)
+      store_list.forEach(item => delete item.dbname)
     }
     return {code: 200,message: "查询成功",data: {store_list}}
   }

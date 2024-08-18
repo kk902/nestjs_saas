@@ -85,7 +85,7 @@ export class UserService {
     const redis = this.redisService.getClient()
     await redis.set(`opensaas:user:${user_id}`,JSON.stringify(findData), 'EX', 3600)
     /**同步用户数据 */
-    await this.SyncData(findData)
+    this.SyncData(findData)
     return findData
   }
 
@@ -104,6 +104,7 @@ export class UserService {
     // //上传用户回调
     for(const item of group) {
       const syncDataUrl = `${item.saasapi}/openSaas/setSassUser`
+      console.log(syncDataUrl);
       const response = await firstValueFrom(this.httpService.post(syncDataUrl,syncData))
     }
     

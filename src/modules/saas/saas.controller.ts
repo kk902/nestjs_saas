@@ -17,6 +17,17 @@ export class SaasController {
     return {code: 200, message: "token获取成功", data: {token}}
   }
 
+  @Get('findStoreList')
+  async find(@Req() req:Request & {user:User & {tokenType: string}} & {ip: string} ) {
+    if(req.user.tokenType !== TokenType.SAAS) throw new HttpException('token错误',HttpStatus.BAD_REQUEST)
+    const userData = JSON.parse(await this.saasService.userRedis(req.user._id))
+    if(userData.status===false) throw new HttpException('你的账号已被禁用，请联系管理员',HttpStatus.BAD_REQUEST)
+    const ip = req.headers['x-forwarded-for']?req.headers['x-forwarded-for']:req.ip.replace(/::ffff:/g,'')//获取访问ip
+    if(!userData.white_list.includes(ip)) throw new HttpException('该ip没有调用权限',HttpStatus.BAD_REQUEST)
+    const data = await this.saasService.storeListRedis(userData.store_list)
+    return {code: 200,message: "查询门店信息成功",data}
+  }
+
   @Post('*')
   async service(@Req() req:Request & {user:User & {tokenType: string}} & {ip: string} ) {
     if(req.user.tokenType !== TokenType.SAAS) throw new HttpException('token错误',HttpStatus.BAD_REQUEST)

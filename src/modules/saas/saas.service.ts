@@ -51,6 +51,18 @@ export class SaasService {
     return await redis.get(key)
   }
 
+  async storeListRedis(store_list: Array<string>) {
+    const redis = this.redisService.getClient()
+    const storeData = []
+    for(const mcode of store_list) {
+      const store = JSON.parse(await this.storeRedis(mcode))
+      delete store.dbname
+      delete store.saasapi
+      delete store.httpapiurl
+      storeData.push(store)
+    }
+    return storeData
+  }
   async storeRedis(mcode: string) {
     const key = `opensaas:store:${mcode}`
     const redis = this.redisService.getClient()

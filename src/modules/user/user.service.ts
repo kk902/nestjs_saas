@@ -2,7 +2,7 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Model } from 'mongoose'
-import { User } from '../user/entities/user.entity';
+import { User, UserRole } from '../user/entities/user.entity';
 import { RedisService } from 'src/config/redis/redis.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { HttpException, HttpStatus } from '@nestjs/common';
@@ -73,6 +73,8 @@ export class UserService {
   async update(updateUserDto: UpdateUserDto) {
     const userData = await this.findOne({user_id: updateUserDto.user_id})
     if(!userData) throw new HttpException('用户不存在', HttpStatus.UNAUTHORIZED);
+    if(userData.role === UserRole.ADMIN && updateUserDto.status === false) 
+      throw new HttpException('无权限禁用管理员', HttpStatus.UNAUTHORIZED);
     if(updateUserDto.password) {
       const flag = await this.authService.comparePasswords(updateUserDto.oldPassword , userData.password)
       if(!flag) throw new HttpException('密码错误', HttpStatus.UNAUTHORIZED);

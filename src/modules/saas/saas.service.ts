@@ -84,8 +84,8 @@ export class SaasService {
     return await redis.get(key)
   }
 
-  async axios(url: string,data: object, mcode: string) : Promise<object> {
-    const response = await firstValueFrom(this.httpService.post(url, data,{ headers: {mcode} }));
+  async axios(url: string,data: object, headers: object) : Promise<object> {
+    const response = await firstValueFrom(this.httpService.post(url, data,{ headers }));
     return response.data
   }
   

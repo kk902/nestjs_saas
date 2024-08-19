@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Model } from 'mongoose'
@@ -15,8 +15,11 @@ import { Store } from '../store/entities/store.entity';
 
 
 
+
 @Injectable()
 export class UserService {
+
+  private readonly logger = new Logger("logger");
   constructor(
     private readonly redisService: RedisService,
 
@@ -28,7 +31,7 @@ export class UserService {
     private readonly httpService: HttpService,
 
     @InjectModel('Store') 
-    private storeModel: Model<Store>,
+    private storeModel: Model<Store>
   ) {}
   async create(createUserDto: CreateUserDto) {
     const {phone_number} = createUserDto
@@ -104,8 +107,9 @@ export class UserService {
     // //上传用户回调
     for(const item of group) {
       const syncDataUrl = `${item.saasapi}/openSaas/setSassUser`
-      console.log(syncDataUrl);
-      const response = await firstValueFrom(this.httpService.post(syncDataUrl,syncData))
+      const response = await firstValueFrom(this.httpService.post(syncDataUrl,syncData)).catch(error=>{
+      this.logger.error(`用户数据同步失败${syncDataUrl}`,error?.message)
+      })
     }
     
     return syncData

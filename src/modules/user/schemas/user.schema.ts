@@ -10,6 +10,7 @@ export const UserSchema = new Schema<User>({
   balance: {type: String, default: "0"},
   appId: { type: String },
   key: { type: String },
+  status: {type: Boolean,default: true},
   white_list: [{ type: String}],
   store_list: [{ type: String}],
   test_callback: {

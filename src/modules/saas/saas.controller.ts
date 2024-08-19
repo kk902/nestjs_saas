@@ -27,7 +27,7 @@ export class SaasController {
     if(!mcode) throw new HttpException('mcode未传入',HttpStatus.BAD_REQUEST)
     /**判断ip是否在白名单内 门店是否在该账号门店列表内 */  
     const userData = JSON.parse(await this.saasService.userRedis(req.user._id))
-    if(!userData.status) throw new HttpException('你的账号已被禁用，请联系管理员',HttpStatus.BAD_REQUEST)
+    if(userData.status===false) throw new HttpException('你的账号已被禁用，请联系管理员',HttpStatus.BAD_REQUEST)
     if(!userData.white_list.includes(ip)) throw new HttpException('该ip没有调用权限',HttpStatus.BAD_REQUEST)
     if(!userData.store_list.includes(mcode)) throw new HttpException('该mcode不在该saas账号下',HttpStatus.BAD_REQUEST)
 

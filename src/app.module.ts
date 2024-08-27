@@ -10,6 +10,7 @@ import { ApiModule } from './modules/api/api.module';
 import { StoreModule } from './modules/store/store.module';
 import { SaasModule } from './modules/saas/saas.module';
 import { PermissModule } from './modules/permiss/permiss.module';
+import { OrderModule } from './modules/order/order.module';
 
 
 
@@ -30,6 +31,7 @@ import { PermissModule } from './modules/permiss/permiss.module';
       global:true
     }),
     SaasModule,
+    OrderModule,
   ]
 })
 export class AppModule implements NestModule {

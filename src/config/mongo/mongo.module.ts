@@ -9,12 +9,13 @@ import { UserSchema } from 'src/modules/user/schemas/user.schema';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(), // 确保 ConfigModule 已经初始化
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         uri: configService.get<string>('MONGODB_URL'),
         maxPoolSize: 10,
-        minPoolSize: 5,
+        minPoolSize: 5
       }),
       inject: [ConfigService],
     }),

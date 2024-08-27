@@ -94,6 +94,12 @@ export class UserService {
     return findData
   }
 
+  async recharge(rechargeDto) {
+    //
+    
+    return {}
+  }
+
   async SyncData(findData: User) {
     const tokenUrl = []
     if(findData.test_callback && findData.test_callback.status) tokenUrl.push({url: findData.test_callback.url})

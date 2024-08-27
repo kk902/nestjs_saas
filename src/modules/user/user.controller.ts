@@ -6,6 +6,7 @@ import { LoginUserDto } from './dto/login-user.dto';
 import { FindAllUserDto } from './dto/findAll-user.dto';
 import { FindOneUserDto } from './dto/findOne-user.dto';
 import { User, UserRole } from './entities/user.entity';
+import { RechargeDto } from './dto/recharge-user.dto';
 
 @Controller('user')
 export class UserController {
@@ -56,6 +57,14 @@ export class UserController {
     updateUserDto.user_id = updateUserDto.user_id || req.user.user_id
     const data = await this.userService.update(updateUserDto);
     return {code: 200, message: "更新用户成功", data}
+  }
+
+  @Post('recharge')
+  async recharge(@Body() rechargeDto: RechargeDto,@Req() req:Request & {user:User}) {
+    if(req.user.role !== UserRole.ADMIN) 
+      throw new HttpException('无权限', HttpStatus.UNAUTHORIZED)
+    const data = await this.userService.recharge(rechargeDto)
+    return {code: 200, message: "充值成功", data}
   }
 }
 

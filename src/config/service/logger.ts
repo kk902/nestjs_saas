@@ -10,7 +10,6 @@ const errType = format((info,ops)=>{
 //  console.log(info,ops)
   return info
 })
-console.log(process.env.MONGODB_URL,"===========")
 const instance = createLogger({
   transports: [
     new winston.transports.Console({

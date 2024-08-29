@@ -10,6 +10,7 @@ export interface User {
   phone_number?: string
   password?: string
   balance?: string
+  credit_line?: string,
   status?: boolean
   appId?: string
   key?: string

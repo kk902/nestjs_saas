@@ -6,6 +6,6 @@ export const PermissSchema = new Schema<Permiss>({
   mcode: {type: String},
   appId: { type: String },
   api_list: [{type: String}]
-});
+},{timestamps: true});
 
 export const PermissModel = model<Permiss>('Permiss', PermissSchema);

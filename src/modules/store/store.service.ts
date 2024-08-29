@@ -60,6 +60,9 @@ export class StoreService {
   async findAll(findAllUserDto: FindAllStoreDto) {
     const {page_index, page_size} = findAllUserDto
     const total = await this.storeModel.countDocuments().exec();
+    if(!total) {
+      return {paginateData: [],total,page_index,totalPages: 0}
+    }
     const skip = (page_index - 1) * page_size
     const totalPages = Math.ceil(total / page_size)
     if(skip >= total) throw new HttpException('超出页数限制', HttpStatus.FORBIDDEN);

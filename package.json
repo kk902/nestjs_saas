@@ -32,6 +32,7 @@
     "@types/bcrypt": "^5.0.2",
     "@types/request-ip": "^0.0.41",
     "bcryptjs": "^2.4.3",
+    "big.js": "^6.2.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "cnpm": "^9.4.0",

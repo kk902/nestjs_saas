@@ -1,4 +1,4 @@
-import { Injectable, OnModuleDestroy, OnModuleInit, Logger } from '@nestjs/common';
+import { Injectable, OnModuleDestroy, OnModuleInit, Logger, HttpException, HttpStatus } from '@nestjs/common';
 import Redis from 'ioredis';
 import { ConfigService } from '@nestjs/config';
 
@@ -47,5 +47,16 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
 
   getClient() {
     return this.redisClient;
+  }
+
+  async addLock(lockKey: string, lockValue: string = "1", expireTime: number = 3000): Promise<boolean> {
+    const result = await this.redisClient.set(lockKey, lockValue,'PX', expireTime,'NX');
+    if(result !== 'OK') throw new HttpException('操作频繁，请稍后再试',HttpStatus.CONFLICT)
+    return true
+  }
+
+  async unLock(lockKey: string): Promise<boolean> {
+    const result = await this.redisClient.del(lockKey)
+    return result === 1;
   }
 }

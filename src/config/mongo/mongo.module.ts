@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ApiSchema } from 'src/modules/api/schemas/api.schema';
+import { OrderSchema } from 'src/modules/order/schemas/order.schema';
 import { PermissSchema } from 'src/modules/permiss/schema/permiss.schema';
 import { SaasSchema } from 'src/modules/saas/schemas/saas.schema';
 import { StoreSchema } from 'src/modules/store/schemas/store.schema';
@@ -24,7 +25,8 @@ import { UserSchema } from 'src/modules/user/schemas/user.schema';
       { name: 'User', schema: UserSchema, collection: "users" },
       { name: 'Store', schema: StoreSchema, collection: "stores" },
       { name: 'Api', schema: ApiSchema, collection: "apis" },
-      { name: 'Permiss', schema: PermissSchema, collection: "permiss" }
+      { name: 'Permiss', schema: PermissSchema, collection: "permiss" },
+      { name: 'Order', schema: OrderSchema, collection: "orders" }
     ]),
   ],
   exports: [MongooseModule],

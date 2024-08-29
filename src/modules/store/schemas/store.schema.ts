@@ -8,9 +8,9 @@ export const StoreSchema = new Schema<Store>({
   status: { type: Number },
   dbname: { type: String },
   api_list: [{type: String}]
-});
+},{timestamps: true});
 
-//export const StoreModel = model<Store>('Store', StoreSchema);
+export const StoreModel = model<Store>('Store', StoreSchema);
 
 // import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 // import { HydratedDocument } from 'mongoose';

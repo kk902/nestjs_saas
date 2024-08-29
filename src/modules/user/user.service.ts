@@ -12,6 +12,7 @@ import { FindAllUserDto } from './dto/findAll-user.dto';
 import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import { Store } from '../store/entities/store.entity';
+import { CreditLineDto } from './dto/creditLine-user.dto';
 
 
 
@@ -58,6 +59,9 @@ export class UserService {
   async findAll(findAllUserDto: FindAllUserDto) {
     const {page_index, page_size} = findAllUserDto
     const total = await this.userModel.countDocuments().exec();
+    if(!total) {
+      return {paginateData: [],total,page_index,totalPages: 0}
+    }
     const skip = (page_index - 1) * page_size
     const totalPages = Math.ceil(total / page_size)
     if(skip >= total) throw new HttpException('超出页数限制', HttpStatus.FORBIDDEN);
@@ -94,10 +98,18 @@ export class UserService {
     return findData
   }
 
-  async recharge(rechargeDto) {
-    //
-    
-    return {}
+  async configcreditLine(creditLineDto: CreditLineDto) {
+    const { user_list, credit_line } = creditLineDto
+    const data = []
+    for(const user_id of user_list) {
+      const result = await this.userModel.updateOne({_id: user_id}, {$set: {credit_line}})
+      const findData = await this.findOne({user_id})
+      delete findData.password
+      const redis = this.redisService.getClient()
+      await redis.set(`opensaas:user:${user_id}`,JSON.stringify(findData), 'EX', 3600)
+      data.push(findData)
+    }
+    return data
   }
 
   async SyncData(findData: User) {

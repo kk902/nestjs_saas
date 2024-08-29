@@ -4,6 +4,7 @@ import { TokenSaasDto } from './dto/token-saas.dto';
 import { User } from '../user/entities/user.entity';
 import { StoreService } from '../store/store.service';
 import { TokenType } from 'src/config/originConfig/origin';
+import Big from 'big.js'
 @Controller('openSaas')
 export class SaasController {
   constructor(
@@ -41,6 +42,9 @@ export class SaasController {
     if(userData.status===false) throw new HttpException('你的账号已被禁用，请联系管理员',HttpStatus.BAD_REQUEST)
     if(!userData.white_list.includes(ip)) throw new HttpException('该ip没有调用权限',HttpStatus.BAD_REQUEST)
     if(!userData.store_list.includes(mcode)) throw new HttpException('该mcode不在该saas账号下',HttpStatus.BAD_REQUEST)
+
+    /**判断余额是否超出透支额度 */
+    if(new Big(userData.credit_line || "0").plus(userData.balance) < 0) throw new HttpException('账号余额不足，请及时充值',HttpStatus.FORBIDDEN)
 
     /**以门店作为颗粒度总拦截 */
     const storeData = JSON.parse(await this.saasService.storeRedis(mcode))

@@ -8,6 +8,7 @@ export const UserSchema = new Schema<User>({
   phone_number: { type: String },
   password: { type: String },
   balance: {type: String, default: "0"},
+  credit_line: {type: String, default: "0"},
   appId: { type: String },
   key: { type: String },
   status: {type: Boolean,default: true},
@@ -21,6 +22,6 @@ export const UserSchema = new Schema<User>({
     url: {type: String},
     status: {type: Boolean}
   }
-});
+},{timestamps: true});
 
 export const UserModel = model<User>('User', UserSchema);

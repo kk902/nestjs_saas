@@ -10,6 +10,6 @@ export const SaasSchema = new Schema<Saas>({
   key: { type: String },
   mcode: { type: String },
   data: { type: Object },
-});
+},{timestamps: true});
 
 export const UserModel = model<Saas>('Saas', SaasSchema);

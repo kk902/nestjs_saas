@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpException, HttpStatus, UseInterceptors, Req } from '@nestjs/common';
+import { Controller, Post, Body, HttpException, HttpStatus, Req } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -6,7 +6,7 @@ import { LoginUserDto } from './dto/login-user.dto';
 import { FindAllUserDto } from './dto/findAll-user.dto';
 import { FindOneUserDto } from './dto/findOne-user.dto';
 import { User, UserRole } from './entities/user.entity';
-import { RechargeDto } from './dto/recharge-user.dto';
+import { CreditLineDto } from './dto/creditLine-user.dto';
 
 @Controller('user')
 export class UserController {
@@ -59,12 +59,11 @@ export class UserController {
     return {code: 200, message: "更新用户成功", data}
   }
 
-  @Post('recharge')
-  async recharge(@Body() rechargeDto: RechargeDto,@Req() req:Request & {user:User}) {
-    if(req.user.role !== UserRole.ADMIN) 
-      throw new HttpException('无权限', HttpStatus.UNAUTHORIZED)
-    const data = await this.userService.recharge(rechargeDto)
-    return {code: 200, message: "充值成功", data}
+  @Post('configcreditLine') 
+  async configcreditLine(@Body() creditLineDto: CreditLineDto,@Req() req:Request & {user:User}) {
+    if(req.user.role !== UserRole.ADMIN) throw new HttpException('无配置用户透支额度权限', HttpStatus.UNAUTHORIZED)
+    const data = await this.userService.configcreditLine(creditLineDto)
+    return {code: 200, message: "配置用户可透支额度成功", data}
   }
 }
 
